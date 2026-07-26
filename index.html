@@ -221,7 +221,6 @@
 
         .hero {
             min-height: 100vh;
-            max-height: 100vh;
             display: flex; align-items: center; justify-content: center;
             position: relative; padding: 0 5%;
         }
@@ -881,6 +880,20 @@
                 grid-template-columns: 1fr !important;
                 gap: 3rem !important;
             }
+            .about-image-frame {
+                aspect-ratio: auto !important;
+                min-height: 350px !important;
+            }
+            .about-image-frame img {
+                position: absolute !important;
+                inset: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
+            }
+            .about-photo-secondary img {
+                height: auto !important;
+                min-height: 200px !important;
+            }
             .nav-links {
                 position: fixed; top: 0; right: -100%;
                 width: 70%; height: 100vh;
@@ -1095,15 +1108,15 @@
                     <div class="image-overlay" style="position: absolute; inset: 0; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); mix-blend-mode: overlay; opacity: 0.4; transition: opacity 0.6s ease;"></div>
                 </div>
                 <div class="about-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
-                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow);">
+                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow); display: block;">
                         <div class="stat-number" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" data-target="50">0</div>
                         <div class="stat-label" style="font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; letter-spacing: 1px; transition: color 0.6s ease;">Projects</div>
                     </div>
-                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow);">
+                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow); display: block;">
                         <div class="stat-number" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" data-target="5">0</div>
                         <div class="stat-label" style="font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; letter-spacing: 1px; transition: color 0.6s ease;">Years Exp</div>
                     </div>
-                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow);">
+                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow); display: block;">
                         <div class="stat-number" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" data-target="120">0</div>
                         <div class="stat-label" style="font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; letter-spacing: 1px; transition: color 0.6s ease;">Articles</div>
                     </div>
@@ -1125,8 +1138,8 @@
                     <span class="skill-tag">Thin Films</span>
                     <span class="skill-tag">Research</span>
                 </div>
-                <div class="about-photo-secondary reveal" style="margin-top: 2rem;">
-                    <img src="images/rahul-color.jpg" alt="Rahul Rathore at H.N.B. Garhwal University campus" style="width: 100%; height: 220px; object-fit: cover; object-position: center 30%; border-radius: 16px; border: 1px solid var(--border); display: block; transition: all 0.4s ease;">
+                <div class="about-photo-secondary reveal" style="margin-top: 2rem; width: 100%;">
+                    <img src="images/rahul-color.jpg" alt="Rahul Rathore at H.N.B. Garhwal University campus" style="width: 100%; height: auto; min-height: 200px; max-height: 280px; object-fit: cover; object-position: center 30%; border-radius: 16px; border: 1px solid var(--border); display: block; transition: all 0.4s ease;">
                     <div class="photo-caption" style="margin-top: 0.75rem; font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; letter-spacing: 1px; color: var(--text-muted);">H.N.B. Garhwal University Campus</div>
                 </div>
             </div>
