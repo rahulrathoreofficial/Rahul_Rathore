@@ -1,0 +1,7 @@
+Place your CV/Resume PDF here and name it:
+
+Rahul_Rathore_CV.pdf
+
+The "Download CV" button in the hero section links to this file.
+
+Make sure the filename matches exactly (case-sensitive).
