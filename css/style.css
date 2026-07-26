@@ -1080,3 +1080,211 @@ footer {
 @media (max-width: 968px) {
     .about-photo-secondary img { height: 180px; }
 }
+
+
+/* ---------- 18. Blog Article Pages ---------- */
+.blog-nav {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    padding: 1rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    background: var(--nav-bg);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.4s ease, background-color 0.6s ease;
+}
+
+.back-link {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.back-link:hover {
+    opacity: 0.8;
+    transform: translateX(-4px);
+}
+
+.blog-article {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 8rem 5% 4rem;
+}
+
+.article-header {
+    margin-bottom: 3rem;
+    text-align: center;
+}
+
+.article-category {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 1rem;
+    transition: color 0.6s ease;
+}
+
+.article-header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.article-meta {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    transition: color 0.6s ease;
+}
+
+.article-meta span {
+    margin: 0 0.3rem;
+}
+
+.article-content {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    transition: color 0.6s ease;
+}
+
+.article-content h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 2.5rem 0 1rem;
+    letter-spacing: 1px;
+    transition: color 0.6s ease;
+}
+
+.article-content h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 2rem 0 0.8rem;
+    transition: color 0.6s ease;
+}
+
+.article-content p {
+    margin-bottom: 1.5rem;
+}
+
+.article-content ul,
+.article-content ol {
+    margin: 0 0 1.5rem 1.5rem;
+    padding-left: 1rem;
+}
+
+.article-content li {
+    margin-bottom: 0.5rem;
+}
+
+.article-content blockquote {
+    border-left: 3px solid var(--accent);
+    padding-left: 1.5rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--text-muted);
+    transition: border-color 0.6s ease, color 0.6s ease;
+}
+
+.article-content code {
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 0.9em;
+    background: var(--bg-card);
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    color: var(--accent);
+    border: 1px solid var(--border);
+    transition: all 0.6s ease;
+}
+
+.article-content strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    transition: color 0.6s ease;
+}
+
+.author-bio {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    margin-top: 4rem;
+    padding: 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    transition: all 0.4s ease, background-color 0.6s ease, border-color 0.6s ease;
+}
+
+.author-bio img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border);
+    filter: grayscale(100%);
+    transition: all 0.4s ease;
+    flex-shrink: 0;
+}
+
+.author-bio:hover img {
+    filter: grayscale(0%);
+    border-color: var(--accent);
+}
+
+.author-bio h4 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    transition: color 0.6s ease;
+}
+
+.author-bio p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    transition: color 0.6s ease;
+}
+
+.blog-footer {
+    padding: 3rem 5%;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    background: var(--bg-secondary);
+    transition: all 0.6s ease;
+    margin-top: 4rem;
+}
+
+@media (max-width: 600px) {
+    .author-bio {
+        flex-direction: column;
+        text-align: center;
+    }
+    .blog-article {
+        padding: 7rem 5% 3rem;
+    }
+}
