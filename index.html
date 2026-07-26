@@ -221,6 +221,7 @@
 
         .hero {
             min-height: 100vh;
+            max-height: 100vh;
             display: flex; align-items: center; justify-content: center;
             position: relative; padding: 0 5%;
         }
@@ -270,7 +271,7 @@
             max-width: 600px; margin: 2rem auto; line-height: 1.8;
             transition: color 0.6s ease;
         }
-        .hero-buttons { display: flex; gap: 1.5rem; justify-content: center; margin-top: 3rem; flex-wrap: wrap; }
+        .hero-buttons { display: flex; gap: 1.2rem; justify-content: center; margin-top: 2.5rem; flex-wrap: wrap; }
 
         .btn {
             padding: 1rem 2.5rem;
@@ -295,7 +296,7 @@
         .btn-secondary:hover { background: var(--glow); transform: translateY(-3px); box-shadow: 0 10px 40px var(--glow); }
 
         .scroll-indicator {
-            position: absolute; bottom: 2rem; left: 50%;
+            position: absolute; bottom: 1.5rem; left: 50%;
             transform: translateX(-50%);
             display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
             animation: bounce 2s infinite;
@@ -312,8 +313,8 @@
             transition: background 0.6s ease;
         }
 
-        section { padding: 8rem 5%; position: relative; }
-        .section-header { margin-bottom: 4rem; text-align: center; }
+        section { padding: 6rem 5%; position: relative; }
+        .section-header { margin-bottom: 4rem; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto; }
         .section-tag {
             font-family: 'Rajdhani', sans-serif;
             font-size: 0.9rem; letter-spacing: 4px;
@@ -340,7 +341,7 @@
         /* CV Section */
         .cv-grid {
             display: grid;
-            grid-template-columns: 1fr 1.5fr;
+            grid-template-columns: 1fr 1fr;
             gap: 4rem;
             max-width: 1200px;
             margin: 0 auto;
@@ -424,10 +425,12 @@
             transition: color 0.6s ease;
         }
 
+
         .skill-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 0.6rem;
+            align-items: stretch;
         }
         .skill-pill {
             padding: 0.5rem 0.8rem;
@@ -439,6 +442,10 @@
             color: var(--text-secondary);
             text-align: center;
             transition: all 0.3s ease, background-color 0.6s ease, color 0.6s ease, border-color 0.6s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 36px;
         }
         .skill-pill:hover {
             border-color: var(--accent);
@@ -535,6 +542,17 @@
             gap: 2rem;
             max-width: 1200px;
             margin: 0 auto;
+        }
+        /* Ensure clean rows with 6 cards */
+        @media (min-width: 1024px) {
+            .lab-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 1023px) and (min-width: 640px) {
+            .lab-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         .lab-card {
             background: var(--bg-card);
@@ -704,7 +722,7 @@
         }
 
         /* Contact */
-        .contact-container { max-width: 800px; margin: 0 auto; text-align: center; }
+        .contact-container { max-width: 700px; margin: 0 auto; text-align: center; }
         .contact-form { display: grid; gap: 1.5rem; margin-top: 3rem; }
         .form-group { position: relative; }
         .form-group input, .form-group textarea {
@@ -845,8 +863,24 @@
         }
         @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
 
+        /* Symmetry fixes for blog grid */
+        .blog-grid {
+            grid-template-columns: repeat(3, 1fr) !important;
+        }
+        @media (max-width: 1024px) {
+            .blog-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+        }
         @media (max-width: 968px) {
             .cv-grid { grid-template-columns: 1fr; }
+            .blog-grid {
+                grid-template-columns: 1fr !important;
+            }
+            .about-grid {
+                grid-template-columns: 1fr !important;
+                gap: 3rem !important;
+            }
             .nav-links {
                 position: fixed; top: 0; right: -100%;
                 width: 70%; height: 100vh;
@@ -951,6 +985,25 @@
             .about-photo-secondary img { height: 180px; }
         }
 
+    
+        .about-left, .about-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .about-right {
+            gap: 0;
+        }
+        .about-right h3 {
+            margin-bottom: 1.5rem;
+        }
+        .about-right p {
+            margin-bottom: 1.5rem;
+        }
+        .about-right p:last-of-type {
+            margin-bottom: 0;
+        }
+
     </style>
 </head>
 <body>
@@ -1035,32 +1088,28 @@
             <h2 class="section-title">The <span>Mind</span> Behind The Code</h2>
             <p class="section-subtitle">Where physics meets digital innovation</p>
         </div>
-        <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; max-width: 1200px; margin: 0 auto;">
-            <div class="about-image reveal">
+        <div class="about-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; max-width: 1200px; margin: 0 auto;">
+            <div class="about-left reveal">
                 <div class="about-image-frame" style="width: 100%; aspect-ratio: 1; border-radius: 20px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; transition: all 0.6s ease;">
                     <img src="images/rahul-bw.jpg" alt="Rahul Rathore - Physicist & Developer" style="width: 100%; height: 100%; object-fit: cover; object-position: center top; filter: grayscale(100%) contrast(1.1); transition: all 0.6s ease;">
                     <div class="image-overlay" style="position: absolute; inset: 0; background: linear-gradient(135deg, var(--gradient-1), var(--gradient-2)); mix-blend-mode: overlay; opacity: 0.4; transition: opacity 0.6s ease;"></div>
                 </div>
-                <div class="about-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem;">
-                    <div class="stat-item" style="text-align: center; padding: 1.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow);">
+                <div class="about-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-top: 1.5rem;">
+                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow);">
                         <div class="stat-number" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" data-target="50">0</div>
-                        <div class="stat-label" style="font-family: 'Rajdhani', sans-serif; font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem; letter-spacing: 1px; transition: color 0.6s ease;">Projects</div>
+                        <div class="stat-label" style="font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; letter-spacing: 1px; transition: color 0.6s ease;">Projects</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" data-target="5">0</div>
-                        <div class="stat-label">Years Exp</div>
+                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow);">
+                        <div class="stat-number" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" data-target="5">0</div>
+                        <div class="stat-label" style="font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; letter-spacing: 1px; transition: color 0.6s ease;">Years Exp</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-number" data-target="120">0</div>
-                        <div class="stat-label">Articles</div>
+                    <div class="stat-item" style="text-align: center; padding: 1.5rem 0.5rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; backdrop-filter: blur(10px); transition: all 0.3s ease, background-color 0.6s ease, border-color 0.6s ease; box-shadow: var(--shadow);">
+                        <div class="stat-number" style="font-family: 'Orbitron', sans-serif; font-size: 2rem; font-weight: 700; background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;" data-target="120">0</div>
+                        <div class="stat-label" style="font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem; letter-spacing: 1px; transition: color 0.6s ease;">Articles</div>
                     </div>
-                </div>
-                <div class="about-photo-secondary reveal">
-                    <img src="images/rahul-color.jpg" alt="Rahul Rathore at H.N.B. Garhwal University campus">
-                    <div class="photo-caption">H.N.B. Garhwal University Campus</div>
                 </div>
             </div>
-            <div class="about-text reveal">
+            <div class="about-right reveal">
                 <h3 style="font-family: 'Orbitron', sans-serif; font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--accent); transition: color 0.6s ease;">Physicist & Digital Creator</h3>
                 <p style="color: var(--text-secondary); line-height: 1.9; margin-bottom: 1.5rem; font-size: 1.05rem; transition: color 0.6s ease;">
                     I'm Rahul Kumar Rathore, an M.Sc. Physics graduate from H.N.B. Garhwal University with a strong foundation in experimental physics, materials science, and computational tools. My research on PMMA-MWCNT composites for X-Ray sensing at Delhi University sparked my interest in building things that matter.
@@ -1068,13 +1117,17 @@
                 <p style="color: var(--text-secondary); line-height: 1.9; margin-bottom: 1.5rem; font-size: 1.05rem; transition: color 0.6s ease;">
                     Beyond the lab, I channel my analytical mindset into developing apps, websites, software tools, and games. I believe the same scientific rigor applied to physics experiments can create exceptional digital experiences.
                 </p>
-                <div class="skills">
+                <div class="skills" style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.5rem;">
                     <span class="skill-tag">Python</span>
                     <span class="skill-tag">MATLAB</span>
                     <span class="skill-tag">Experimental Physics</span>
                     <span class="skill-tag">R.F. Systems</span>
                     <span class="skill-tag">Thin Films</span>
                     <span class="skill-tag">Research</span>
+                </div>
+                <div class="about-photo-secondary reveal" style="margin-top: 2rem;">
+                    <img src="images/rahul-color.jpg" alt="Rahul Rathore at H.N.B. Garhwal University campus" style="width: 100%; height: 220px; object-fit: cover; object-position: center 30%; border-radius: 16px; border: 1px solid var(--border); display: block; transition: all 0.4s ease;">
+                    <div class="photo-caption" style="margin-top: 0.75rem; font-family: 'Rajdhani', sans-serif; font-size: 0.85rem; letter-spacing: 1px; color: var(--text-muted);">H.N.B. Garhwal University Campus</div>
                 </div>
             </div>
         </div>
@@ -1106,7 +1159,7 @@
             <h2 class="section-title">Research <span>Notes</span></h2>
             <p class="section-subtitle">Thoughts on physics, research, and technology</p>
         </div>
-        <div class="lab-grid" style="max-width: 1200px; margin: 0 auto;">
+        <div class="lab-grid blog-grid" style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(3, 1fr);">
             <article class="lab-card reveal" style="cursor: pointer;">
                 <div class="lab-thumb">
                     <div class="lab-thumb-icon">🔬</div>
@@ -1429,6 +1482,17 @@
                 icon: "⚛️",
                 demoLink: "#",
                 codeLink: "#"
+            },
+            {
+                id: 6,
+                title: "Physics Formula Hub",
+                category: "app",
+                description: "A comprehensive reference app for physics formulas, constants, and unit conversions tailored for students and researchers.",
+                stack: ["Flutter", "Dart", "LaTeX"],
+                status: "soon",
+                icon: "📐",
+                demoLink: "#",
+                codeLink: "#"
             }
         ];
 
@@ -1697,8 +1761,9 @@
             const scrolled = window.pageYOffset;
             const heroContent = document.querySelector('.hero-content');
             if (heroContent && window.innerWidth > 968) {
-                heroContent.style.transform = `translateY(${scrolled * 0.15}px)`;
-                heroContent.style.opacity = Math.max(0, 1 - (scrolled / 600));
+                heroContent.style.transform = `translateY(${scrolled * 0.1}px)`;
+                // Subtle fade only after significant scroll, no awkward gap
+                heroContent.style.opacity = Math.max(0.3, 1 - (scrolled / 900));
             }
         });
 
