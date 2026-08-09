@@ -111,21 +111,15 @@ window.addEventListener('load', () => {
     'use strict';
 
     const canvas = document.getElementById('particle-canvas');
-    if (!canvas) {
-        console.error('QNN: Canvas element not found');
-        return;
-    }
-
+    if (!canvas) { console.error('QNN: Canvas not found'); return; }
     const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        console.error('QNN: Could not get canvas context');
-        return;
-    }
+    if (!ctx) { console.error('QNN: Context not found'); return; }
 
     let mouseX = 0, mouseY = 0;
     let qnnNodes = [];
     let qnnConnections = [];
     let qnnPulses = [];
+    let shockwaves = [];
     let camera = { rotX: 0, rotY: 0, zoom: 1 };
     let isDragging = false;
     let dragStartX = 0, dragStartY = 0;
@@ -141,9 +135,7 @@ window.addEventListener('load', () => {
                 g: parseInt(style.getPropertyValue('--particle-g')) || 255,
                 b: parseInt(style.getPropertyValue('--particle-b')) || 255
             };
-        } catch (e) {
-            return { r: 255, g: 255, b: 255 };
-        }
+        } catch (e) { return { r: 255, g: 255, b: 255 }; }
     }
 
     function resizeCanvas() {
@@ -151,9 +143,7 @@ window.addEventListener('load', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             initQNN();
-        } catch (e) {
-            console.error('QNN resize error:', e);
-        }
+        } catch (e) { console.error('QNN resize error:', e); }
     }
 
     class QNNNode {
@@ -161,7 +151,7 @@ window.addEventListener('load', () => {
             this.ox = x; this.oy = y; this.oz = z;
             this.x = x; this.y = y; this.z = z;
             this.idx = idx;
-            this.size = 1.2 + Math.random() * 2;
+            this.size = 0.8 + Math.random() * 1.8;
             this.phase = Math.random() * Math.PI * 2;
             this.energy = 0;
         }
@@ -188,16 +178,16 @@ window.addEventListener('load', () => {
             if (!proj || !proj.visible) return;
             let breathe = Math.sin(time * 1.5 + this.phase) * 0.3 + 0.7;
             let s = this.size * proj.scale * breathe;
-            let alpha = Math.max(0, Math.min(1, (1 - (proj.z + 300) / 1200))) * 0.7;
+            let alpha = Math.max(0, Math.min(1, (1 - (proj.z + 300) / 1200))) * 0.6;
 
             // Glow
-            let g = ctx.createRadialGradient(proj.x, proj.y, 0, proj.x, proj.y, s * 6);
-            g.addColorStop(0, `rgba(${color.r},${color.g},${color.b},${alpha * 0.35})`);
-            g.addColorStop(0.5, `rgba(${color.r},${color.g},${color.b},${alpha * 0.06})`);
+            let g = ctx.createRadialGradient(proj.x, proj.y, 0, proj.x, proj.y, s * 5);
+            g.addColorStop(0, `rgba(${color.r},${color.g},${color.b},${alpha * 0.3})`);
+            g.addColorStop(0.5, `rgba(${color.r},${color.g},${color.b},${alpha * 0.05})`);
             g.addColorStop(1, `rgba(${color.r},${color.g},${color.b},0)`);
             ctx.fillStyle = g;
             ctx.beginPath();
-            ctx.arc(proj.x, proj.y, s * 6, 0, Math.PI * 2);
+            ctx.arc(proj.x, proj.y, s * 5, 0, Math.PI * 2);
             ctx.fill();
 
             // Core
@@ -210,9 +200,9 @@ window.addEventListener('load', () => {
             if (this.energy > 0.01) {
                 ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},${this.energy * alpha})`;
                 ctx.beginPath();
-                ctx.arc(proj.x, proj.y, s * (1 + this.energy * 5), 0, Math.PI * 2);
+                ctx.arc(proj.x, proj.y, s * (1 + this.energy * 6), 0, Math.PI * 2);
                 ctx.fill();
-                this.energy *= 0.93;
+                this.energy *= 0.92;
             }
         }
     }
@@ -221,67 +211,138 @@ window.addEventListener('load', () => {
         constructor(startIdx) {
             this.path = [startIdx];
             this.progress = 0;
-            this.speed = 0.07;
+            this.speed = 0.08;
             this.current = startIdx;
             this.dead = false;
         }
-
         step() {
             if (this.dead) return;
             this.progress += this.speed;
             let candidates = qnnConnections.filter(c => c.a === this.current || c.b === this.current);
-            if (candidates.length === 0 || this.path.length > 7) {
-                this.dead = true;
-                return;
-            }
+            if (candidates.length === 0 || this.path.length > 8) { this.dead = true; return; }
             let next = candidates[Math.floor(Math.random() * candidates.length)];
-            let nextIdx = next.a === this.current ? next.b : next.a;
-            if (!this.path.includes(nextIdx)) {
-                this.path.push(nextIdx);
+            let ni = next.a === this.current ? next.b : next.a;
+            if (!this.path.includes(ni)) {
+                this.path.push(ni);
                 if (qnnNodes[this.current]) qnnNodes[this.current].energy = 1;
-                this.current = nextIdx;
-            } else {
-                this.dead = true;
-            }
+                this.current = ni;
+            } else this.dead = true;
         }
-
         draw(color) {
             if (this.path.length < 2) return;
             let idx = Math.min(Math.floor(this.progress), this.path.length - 1);
             let from = qnnNodes[this.path[idx]];
-            let toIdx = this.path[Math.min(idx + 1, this.path.length - 1)];
-            let to = qnnNodes[toIdx];
+            let to = qnnNodes[this.path[Math.min(idx + 1, this.path.length - 1)]];
             if (!from || !to) return;
-            let p1 = from.project();
-            let p2 = to.project();
+            let p1 = from.project(), p2 = to.project();
             if (!p1 || !p2 || !p1.visible || !p2.visible) return;
             let t = this.progress - idx;
             let x = p1.x + (p2.x - p1.x) * t;
             let y = p1.y + (p2.y - p1.y) * t;
 
-            // Pulse glow
-            let g = ctx.createRadialGradient(x, y, 0, x, y, 16);
-            g.addColorStop(0, `rgba(${color.r},${color.g},${color.b},0.9)`);
-            g.addColorStop(0.3, `rgba(${color.r},${color.g},${color.b},0.2)`);
+            let g = ctx.createRadialGradient(x, y, 0, x, y, 14);
+            g.addColorStop(0, `rgba(${color.r},${color.g},${color.b},0.85)`);
+            g.addColorStop(0.3, `rgba(${color.r},${color.g},${color.b},0.15)`);
             g.addColorStop(1, `rgba(${color.r},${color.g},${color.b},0)`);
             ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.arc(x, y, 16, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, 14, 0, Math.PI * 2); ctx.fill();
 
-            // Core dot
             ctx.fillStyle = `rgba(${color.r},${color.g},${color.b},1)`;
-            ctx.beginPath();
-            ctx.arc(x, y, 2.5, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill();
 
-            // Trail
-            ctx.strokeStyle = `rgba(${color.r},${color.g},${color.b},0.4)`;
+            ctx.strokeStyle = `rgba(${color.r},${color.g},${color.b},0.35)`;
             ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(x, y); ctx.stroke();
+        }
+    }
+
+    // SHOCKWAVE: radial burst from click point
+    class Shockwave {
+        constructor(ox, oy) {
+            this.ox = ox; this.oy = oy;
+            this.radius = 0;
+            this.maxRadius = Math.max(canvas.width, canvas.height) * 0.9;
+            this.speed = 10;
+            this.dead = false;
+            this.radialLines = [];
+            this.age = 0;
+        }
+
+        step() {
+            this.age++;
+            this.radius += this.speed;
+            if (this.radius > this.maxRadius) { this.dead = true; return; }
+
+            let ringInner = this.radius - 40;
+            let ringOuter = this.radius + 40;
+
+            qnnNodes.forEach((n, i) => {
+                let p = n.project();
+                if (!p || !p.visible) return;
+                let dx = p.x - this.ox;
+                let dy = p.y - this.oy;
+                let dist = Math.sqrt(dx*dx + dy*dy);
+
+                if (dist >= ringInner && dist <= ringOuter) {
+                    let intensity = Math.max(0, 1 - dist / this.maxRadius);
+                    n.energy = Math.max(n.energy, intensity);
+
+                    this.radialLines.push({
+                        tx: p.x, ty: p.y,
+                        intensity: intensity,
+                        life: 1.0
+                    });
+                }
+            });
+        }
+
+        draw(color) {
+            let colorStr = `${color.r},${color.g},${color.b}`;
+            let globalFade = Math.max(0, 1 - this.age / 80);
+
+            // Expanding ring
+            let ringAlpha = globalFade * 0.25;
+            ctx.strokeStyle = `rgba(${colorStr},${ringAlpha})`;
+            ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(x, y);
+            ctx.arc(this.ox, this.oy, this.radius, 0, Math.PI * 2);
             ctx.stroke();
+
+            // Secondary ring (echo)
+            let echoR = this.radius * 0.7;
+            if (echoR > 0) {
+                ctx.strokeStyle = `rgba(${colorStr},${ringAlpha * 0.4})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.arc(this.ox, this.oy, echoR, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Radial lines from click point to hit nodes
+            this.radialLines.forEach(line => {
+                line.life -= 0.025;
+                if (line.life <= 0) return;
+                let a = line.intensity * line.life * globalFade * 0.9;
+                if (a <= 0.01) return;
+
+                ctx.strokeStyle = `rgba(${colorStr},${a})`;
+                ctx.lineWidth = 1.2 * line.life;
+                ctx.beginPath();
+                ctx.moveTo(this.ox, this.oy);
+                ctx.lineTo(line.tx, line.ty);
+                ctx.stroke();
+
+                // Small glow at the node end
+                let g = ctx.createRadialGradient(line.tx, line.ty, 0, line.tx, line.ty, 6);
+                g.addColorStop(0, `rgba(${colorStr},${a * 0.5})`);
+                g.addColorStop(1, `rgba(${colorStr},0)`);
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(line.tx, line.ty, 6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+
+            this.radialLines = this.radialLines.filter(l => l.life > 0);
         }
     }
 
@@ -290,12 +351,15 @@ window.addEventListener('load', () => {
             qnnNodes = [];
             qnnConnections = [];
             qnnPulses = [];
+            shockwaves = [];
 
-            let count = Math.min(Math.floor(window.innerWidth / 12), 100);
-            let r = Math.max(canvas.width, canvas.height) * 0.55;
-            if (r < 100) r = 100; // Minimum radius
+            // DENSER: up to 220 nodes
+            let count = Math.min(Math.floor(window.innerWidth / 8), 220);
+            // Larger radius to cover full viewport
+            let r = Math.max(canvas.width, canvas.height) * 0.65;
+            if (r < 150) r = 150;
 
-            // Spherical distribution covering full screen
+            // Spherical distribution
             for (let i = 0; i < count; i++) {
                 let phi = Math.acos(-1 + (2 * i) / count);
                 let theta = Math.sqrt(count * Math.PI) * phi;
@@ -305,118 +369,106 @@ window.addEventListener('load', () => {
                 qnnNodes.push(new QNNNode(x, y, z, i));
             }
 
-            // Build connections based on 3D proximity
+            // DENSER connections: wider threshold
             for (let i = 0; i < qnnNodes.length; i++) {
                 for (let j = i + 1; j < qnnNodes.length; j++) {
                     let dx = qnnNodes[i].ox - qnnNodes[j].ox;
                     let dy = qnnNodes[i].oy - qnnNodes[j].oy;
                     let dz = qnnNodes[i].oz - qnnNodes[j].oz;
-                    let dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
-                    if (dist < r * 0.35) {
-                        qnnConnections.push({ a: i, b: j, dist: dist });
+                    let dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+                    if (dist < r * 0.42) {
+                        qnnConnections.push({ a: i, b: j });
                     }
                 }
             }
-        } catch (e) {
-            console.error('QNN init error:', e);
-        }
+        } catch (e) { console.error('QNN init error:', e); }
     }
 
     function isInteractive(el) {
         if (!el || !el.tagName) return false;
         const tag = el.tagName.toLowerCase();
         return tag === 'a' || tag === 'button' || tag === 'input' || tag === 'textarea' ||
-               tag === 'select' || tag === 'label' || 
-               (el.closest && (el.closest('a') || el.closest('button') || el.closest('.lab-card') || 
-                el.closest('.nav-links') || el.closest('.menu-toggle') || 
+               tag === 'select' || tag === 'label' ||
+               (el.closest && (el.closest('a') || el.closest('button') || el.closest('.lab-card') ||
+                el.closest('.nav-links') || el.closest('.menu-toggle') ||
                 el.closest('.theme-toggle') || el.closest('.contact-form')));
     }
 
-    // Track mouse for drag rotation
-    window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-    });
+    window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
 
-    // Click anywhere to pulse
+    // CLICK: create shockwave + pulse
     window.addEventListener('click', (e) => {
         if (isInteractive(e.target)) return;
-        if (!qnnNodes.length) return;
 
         try {
+            // Always create shockwave at click point
+            shockwaves.push(new Shockwave(e.clientX, e.clientY));
+
+            // Also find nearest node for network pulse
             let best = -1, bestDist = Infinity;
             qnnNodes.forEach((n, i) => {
                 let p = n.project();
                 if (!p || !p.visible) return;
                 let dx = e.clientX - p.x, dy = e.clientY - p.y;
-                let d = Math.sqrt(dx * dx + dy * dy);
-                if (d < bestDist && d < 120) { bestDist = d; best = i; }
+                let d = Math.sqrt(dx*dx + dy*dy);
+                if (d < bestDist && d < 150) { bestDist = d; best = i; }
             });
 
             if (best >= 0) {
                 qnnPulses.push(new QNNPulse(best));
                 qnnNodes[best].energy = 1;
             } else {
-                let visibleNodes = qnnNodes.map((n, i) => ({ idx: i, proj: n.project() }))
+                let visible = qnnNodes.map((n, i) => ({ idx: i, proj: n.project() }))
                     .filter(n => n.proj && n.proj.visible);
-                if (visibleNodes.length > 0) {
-                    let closest = visibleNodes.reduce((a, b) => {
-                        let da = Math.sqrt((e.clientX - a.proj.x) ** 2 + (e.clientY - a.proj.y) ** 2);
-                        let db = Math.sqrt((e.clientX - b.proj.x) ** 2 + (e.clientY - b.proj.y) ** 2);
+                if (visible.length > 0) {
+                    let closest = visible.reduce((a, b) => {
+                        let da = Math.sqrt((e.clientX - a.proj.x)**2 + (e.clientY - a.proj.y)**2);
+                        let db = Math.sqrt((e.clientX - b.proj.x)**2 + (e.clientY - b.proj.y)**2);
                         return da < db ? a : b;
                     });
                     qnnPulses.push(new QNNPulse(closest.idx));
                     qnnNodes[closest.idx].energy = 1;
                 }
             }
-        } catch (err) {
-            console.error('QNN click error:', err);
-        }
+        } catch (err) { console.error('QNN click error:', err); }
     });
 
     // Drag to rotate
     window.addEventListener('mousedown', (e) => {
         if (isInteractive(e.target)) return;
         isDragging = true;
-        dragStartX = e.clientX;
-        dragStartY = e.clientY;
-        cameraRotYStart = camera.rotY;
-        cameraRotXStart = camera.rotX;
+        dragStartX = e.clientX; dragStartY = e.clientY;
+        cameraRotYStart = camera.rotY; cameraRotXStart = camera.rotX;
     });
-
     window.addEventListener('mousemove', (e) => {
         if (isDragging) {
             camera.rotY = cameraRotYStart + (e.clientX - dragStartX) * 0.004;
             camera.rotX = cameraRotXStart + (e.clientY - dragStartY) * 0.004;
         }
     });
-
     window.addEventListener('mouseup', () => isDragging = false);
 
-    // Touch support
+    // Touch
     window.addEventListener('touchstart', (e) => {
         if (isInteractive(e.target)) return;
         let t = e.touches[0];
         isDragging = true;
-        dragStartX = t.clientX;
-        dragStartY = t.clientY;
-        cameraRotYStart = camera.rotY;
-        cameraRotXStart = camera.rotX;
+        dragStartX = t.clientX; dragStartY = t.clientY;
+        cameraRotYStart = camera.rotY; cameraRotXStart = camera.rotX;
+        shockwaves.push(new Shockwave(t.clientX, t.clientY));
 
-        if (!qnnNodes.length) return;
-        let visibleNodes = qnnNodes.map((n, i) => ({ idx: i, proj: n.project() }))
+        let visible = qnnNodes.map((n, i) => ({ idx: i, proj: n.project() }))
             .filter(n => n.proj && n.proj.visible);
-        if (visibleNodes.length > 0) {
-            let closest = visibleNodes.reduce((a, b) => {
-                let da = Math.sqrt((t.clientX - a.proj.x) ** 2 + (t.clientY - a.proj.y) ** 2);
-                let db = Math.sqrt((t.clientX - b.proj.x) ** 2 + (t.clientY - b.proj.y) ** 2);
+        if (visible.length > 0) {
+            let closest = visible.reduce((a, b) => {
+                let da = Math.sqrt((t.clientX - a.proj.x)**2 + (t.clientY - a.proj.y)**2);
+                let db = Math.sqrt((t.clientX - b.proj.x)**2 + (t.clientY - b.proj.y)**2);
                 return da < db ? a : b;
             });
             qnnPulses.push(new QNNPulse(closest.idx));
             qnnNodes[closest.idx].energy = 1;
         }
     });
-
     window.addEventListener('touchmove', (e) => {
         if (isDragging) {
             let t = e.touches[0];
@@ -424,7 +476,6 @@ window.addEventListener('load', () => {
             camera.rotX = cameraRotXStart + (t.clientY - dragStartY) * 0.004;
         }
     });
-
     window.addEventListener('touchend', () => isDragging = false);
 
     function animateQNN() {
@@ -434,8 +485,8 @@ window.addEventListener('load', () => {
             let color = getParticleColor();
 
             if (!isDragging) {
-                camera.rotY += 0.0008;
-                camera.rotX = Math.sin(time * 0.15) * 0.06;
+                camera.rotY += 0.0006;
+                camera.rotX = Math.sin(time * 0.12) * 0.05;
             }
 
             // Draw connections
@@ -443,16 +494,14 @@ window.addEventListener('load', () => {
                 let p1 = qnnNodes[c.a] ? qnnNodes[c.a].project() : null;
                 let p2 = qnnNodes[c.b] ? qnnNodes[c.b].project() : null;
                 if (!p1 || !p2 || !p1.visible || !p2.visible) return;
-                let alpha = Math.max(0, Math.min(1, (1 - (p1.z + p2.z + 500) / 1800))) * 0.07;
-                let energyBoost = ((qnnNodes[c.a] && qnnNodes[c.a].energy) || 0) + 
-                                  ((qnnNodes[c.b] && qnnNodes[c.b].energy) || 0) * 0.2;
-                alpha += energyBoost;
+                let alpha = Math.max(0, Math.min(1, (1 - (p1.z + p2.z + 500) / 1800))) * 0.06;
+                let eb = ((qnnNodes[c.a] && qnnNodes[c.a].energy) || 0) +
+                         ((qnnNodes[c.b] && qnnNodes[c.b].energy) || 0) * 0.15;
+                alpha += eb;
                 ctx.strokeStyle = `rgba(${color.r},${color.g},${color.b},${alpha})`;
-                ctx.lineWidth = 0.5 + energyBoost;
+                ctx.lineWidth = 0.5 + eb;
                 ctx.beginPath();
-                ctx.moveTo(p1.x, p1.y);
-                ctx.lineTo(p2.x, p2.y);
-                ctx.stroke();
+                ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
             });
 
             // Draw nodes
@@ -462,6 +511,10 @@ window.addEventListener('load', () => {
             qnnPulses = qnnPulses.filter(p => !p.dead);
             qnnPulses.forEach(p => { p.step(); p.draw(color); });
 
+            // Update and draw shockwaves
+            shockwaves = shockwaves.filter(s => !s.dead);
+            shockwaves.forEach(s => { s.step(); s.draw(color); });
+
             animationId = requestAnimationFrame(animateQNN);
         } catch (e) {
             console.error('QNN animation error:', e);
@@ -469,7 +522,6 @@ window.addEventListener('load', () => {
         }
     }
 
-    // Start
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     animateQNN();
